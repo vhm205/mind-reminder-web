@@ -71,3 +71,26 @@ button:focus-visible {
 		background-color: #f9f9f9;
 	}
 }
+
+.btn-social {
+	display: inline-block;
+	font-size: 16px;
+	line-height: 20px;
+	padding: 9px 21px 11px;
+	border-radius: 20px;
+	vertical-align: top;
+}
+
+.btn-icon-social {
+	vertical-align: top;
+	display: inline-block;
+	width: 24px;
+	height: 22px;
+	margin: 0 13px -2px -7px;
+}
+
+.card-new-note {
+	border-radius: 34px;
+	-webkit-box-shadow: 0 4px 35px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 4px 35px rgba(0, 0, 0, 0.1);
+}

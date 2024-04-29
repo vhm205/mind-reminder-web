@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 
-const useSocket = () => {
+export const useSocket = () => {
 	const [isConnected, setIsConnected] = useState(false);
 	const socketRef = useRef<Socket>();
 
@@ -71,5 +71,3 @@ const useSocket = () => {
 		removeListener,
 	};
 };
-
-export default useSocket;

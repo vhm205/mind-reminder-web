@@ -7,13 +7,14 @@ type Props = {
 	icon: ReactNode;
 	text: string;
 	link: string;
+	end?: boolean;
 };
 
-export const SidebarItem: FC<Props> = ({ icon, text, link }) => {
+export const SidebarItem: FC<Props> = ({ icon, text, link, end = false }) => {
 	const { expanded } = useContext(SidebarContext);
 
 	return (
-		<NavLink to={link}>
+		<NavLink to={link} end={end}>
 			{({ isActive }) => (
 				<li
 					className={cn(

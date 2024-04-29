@@ -5,5 +5,5 @@ type Props = {
 };
 
 export const SidebarContext = createContext<Props>({
-	expanded: true,
+	expanded: false,
 });

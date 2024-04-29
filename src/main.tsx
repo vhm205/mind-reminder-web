@@ -1,15 +1,22 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from "react";
+import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import App from './App.tsx'
+import App from "./App.tsx";
 
-import './styles/index.css'
-import './styles/loader.css'
+import "./styles/index.css";
+import "./styles/loader.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-	<React.StrictMode>
+const component =
+	import.meta.env.VITE_ENV === "development" ? (
 		<BrowserRouter>
 			<App />
 		</BrowserRouter>
-	</React.StrictMode>
-);
+	) : (
+		<React.StrictMode>
+			<BrowserRouter>
+				<App />
+			</BrowserRouter>
+		</React.StrictMode>
+	);
+
+ReactDOM.createRoot(document.getElementById("root")!).render(component);

@@ -12,7 +12,7 @@ type Props = {
 }
 
 export const Sidebar: FC<Props> = ({ children }) => {
-	const [expanded, setExpanded] = useState(true);
+	const [expanded, setExpanded] = useState(false);
 
 	return (
 		<aside className="h-screen">
