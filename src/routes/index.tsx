@@ -19,28 +19,29 @@ const ListChannelPage = lazy(() => import("@/pages/channel/ListChannel"));
 export const Router = () => {
   return (
     <Routes>
-      <Route path="/">
-        <Route element={<BasicLayout />}>
-          <Route element={<HomePage />} />
-          <Route
-            index
-            path="login"
-            element={
-              <Suspense fallback={<Loader />}>
-                <LoginPage />
-              </Suspense>
-            }
-          />
-        </Route>
+      <Route path="/auth" element={<BasicLayout />}>
+        <Route
+          path="login"
+          element={
+            <Suspense fallback={<Loader />}>
+              <LoginPage />
+            </Suspense>
+          }
+        />
+      </Route>
 
-        <Route path="notes" element={<UserLayout />}>
-          <Route path="new" element={<CreateNotePage />} />
-          <Route index element={<ListNotePage />} />
-        </Route>
+      <Route path="/" element={<UserLayout />}>
+        <Route index element={<HomePage />} />
 
-        <Route path="channels" element={<UserLayout />}>
-          <Route index element={<ListChannelPage />} />
-        </Route>
+        <Route path="notes" element={<ListNotePage />} />
+        <Route path="notes/new" element={<CreateNotePage />} />
+
+        {/* <Route path="notes" element={<UserLayout />}> */}
+        {/*   <Route path="new" element={<CreateNotePage />} /> */}
+        {/*   <Route index element={<ListNotePage />} /> */}
+        {/* </Route> */}
+
+        <Route path="channels" element={<ListChannelPage />} />
 
         <Route path="*" element={<NotFound />} />
       </Route>
