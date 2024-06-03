@@ -6,7 +6,6 @@ import App from "./App.tsx";
 import "./styles/index.css";
 import "./styles/loader.css";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { AuthProvider } from "./contexts/AuthContext.tsx";
 
 // const component =
 //   import.meta.env.VITE_ENV === "development" ? (
@@ -66,11 +65,9 @@ const theme = extendTheme({
 
 const component = (
   <ChakraProvider theme={theme}>
-    <AuthProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </AuthProvider>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </ChakraProvider>
 );
 
