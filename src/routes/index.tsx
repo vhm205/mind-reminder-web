@@ -18,34 +18,32 @@ const ListChannelPage = lazy(() => import("@/pages/channel/ListChannel"));
 
 export const Router = () => {
   return (
-    <>
-      <Routes>
-        <Route path="/">
-          <Route element={<BasicLayout />}>
-            <Route element={<HomePage />} />
-            <Route
-              index
-              path="login"
-              element={
-                <Suspense fallback={<Loader />}>
-                  <LoginPage />
-                </Suspense>
-              }
-            />
-          </Route>
-
-          <Route path="notes" element={<UserLayout />}>
-            <Route path="new" element={<CreateNotePage />} />
-            <Route index element={<ListNotePage />} />
-          </Route>
-
-          <Route path="channels" element={<UserLayout />}>
-            <Route index element={<ListChannelPage />} />
-          </Route>
-
-          <Route path="*" element={<NotFound />} />
+    <Routes>
+      <Route path="/">
+        <Route element={<BasicLayout />}>
+          <Route element={<HomePage />} />
+          <Route
+            index
+            path="login"
+            element={
+              <Suspense fallback={<Loader />}>
+                <LoginPage />
+              </Suspense>
+            }
+          />
         </Route>
-      </Routes>
-    </>
+
+        <Route path="notes" element={<UserLayout />}>
+          <Route path="new" element={<CreateNotePage />} />
+          <Route index element={<ListNotePage />} />
+        </Route>
+
+        <Route path="channels" element={<UserLayout />}>
+          <Route index element={<ListChannelPage />} />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   );
 };
