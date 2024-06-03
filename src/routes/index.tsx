@@ -22,7 +22,7 @@ export const Router = () => {
       <Routes>
         <Route path="/">
           <Route element={<BasicLayout />}>
-            {/* <Route index element={<HomePage />} /> */}
+            <Route element={<HomePage />} />
             <Route
               index
               path="login"
