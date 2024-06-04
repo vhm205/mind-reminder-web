@@ -10,40 +10,40 @@ import { DropdownMenu } from "@/components/dropdown/DropdownMenu";
 import { Loader } from "@/components/loader";
 
 export const UserLayout: FC = () => {
-	return (
-		<main className="flex w-screen">
-			<Sidebar>
-				<SidebarItem
-					icon={<MdAddBox size={26} />}
-					text="New Note"
-					link="/notes/new"
-				/>
-				<SidebarItem
-					icon={<MdFormatListBulleted size={26} />}
-					text="Notes"
-					link="/notes"
-					end={true}
-				/>
-				<SidebarItem
-					icon={<GrIntegration size={26} />}
-					text="Channels"
-					link="/channels"
-				/>
-				<SidebarItem
-					icon={<GrMemory size={26} />}
-					text="Memory Card"
-					link="/memory-card"
-				/>
-			</Sidebar>
+  return (
+    <main className="flex w-screen">
+      <Sidebar>
+        <SidebarItem
+          icon={<MdAddBox size={26} />}
+          text="New Note"
+          link="/notes/new"
+        />
+        <SidebarItem
+          icon={<MdFormatListBulleted size={26} />}
+          text="Notes"
+          link="/notes"
+          end={true}
+        />
+        <SidebarItem
+          icon={<GrIntegration size={26} />}
+          text="Channels"
+          link="/channels"
+        />
+        <SidebarItem
+          icon={<GrMemory size={26} />}
+          text="Memory Card"
+          link="/memory-card"
+        />
+      </Sidebar>
 
-			<Suspense fallback={<Loader />}>
-				<div className="flex max-h-screen grow flex-col">
-					<div className="flex justify-end p-4">
-						<DropdownMenu />
-					</div>
-					<Outlet />
-				</div>
-			</Suspense>
-		</main>
-	);
+      <Suspense fallback={<Loader />}>
+        <div className="flex max-h-screen grow flex-col">
+          <div className="flex justify-end p-4">
+            <DropdownMenu />
+          </div>
+          <Outlet />
+        </div>
+      </Suspense>
+    </main>
+  );
 };

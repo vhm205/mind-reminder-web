@@ -36,11 +36,6 @@ export const Router = () => {
         <Route path="notes" element={<ListNotePage />} />
         <Route path="notes/create" element={<CreateNotePage />} />
 
-        {/* <Route path="notes" element={<UserLayout />}> */}
-        {/*   <Route path="new" element={<CreateNotePage />} /> */}
-        {/*   <Route index element={<ListNotePage />} /> */}
-        {/* </Route> */}
-
         <Route path="channels" element={<ListChannelPage />} />
 
         <Route path="*" element={<NotFound />} />
