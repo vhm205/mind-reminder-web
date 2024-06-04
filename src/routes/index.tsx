@@ -34,7 +34,7 @@ export const Router = () => {
         <Route index element={<HomePage />} />
 
         <Route path="notes" element={<ListNotePage />} />
-        <Route path="notes/new" element={<CreateNotePage />} />
+        <Route path="notes/create" element={<CreateNotePage />} />
 
         {/* <Route path="notes" element={<UserLayout />}> */}
         {/*   <Route path="new" element={<CreateNotePage />} /> */}
