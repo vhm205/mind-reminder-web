@@ -1,10 +1,13 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { injectSpeedInsights } from "@vercel/speed-insights";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import App from "./App.tsx";
 
 import "./styles/index.css";
 import "./styles/loader.css";
+
+injectSpeedInsights();
 
 const theme = extendTheme({
   components: {
