@@ -16,7 +16,7 @@ export const UserLayout: FC = () => {
         <SidebarItem
           icon={<MdAddBox size={26} />}
           text="New Note"
-          link="/notes/new"
+          link="/notes/create"
         />
         <SidebarItem
           icon={<MdFormatListBulleted size={26} />}
