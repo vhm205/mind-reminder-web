@@ -11,13 +11,14 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { MdOutlineMenu, MdLogout } from "react-icons/md";
 
 import { request, defaultConfig } from "@/apis/axios";
+import { logout } from "@/utils";
 
 export const DropdownMenu: FC = () => {
   const handleLogout = async () => {
     try {
       const { server } = defaultConfig;
       await request.get(`${server.baseUrl}/auth/logout`);
-      window.location.replace("/auth/login");
+      logout();
     } catch (err: any) {
       console.error(err);
     }

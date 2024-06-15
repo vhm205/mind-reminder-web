@@ -4,8 +4,7 @@ import { useToast } from "@chakra-ui/react";
 import { FaFacebookMessenger, FaTelegramPlane } from "react-icons/fa";
 import { request } from "@/apis/axios";
 import type { IHttpResponse } from "@/types/http";
-import { useAuth } from "@/hooks";
-import { AlertCustom } from "@/utils";
+import { AlertCustom, getUID } from "@/utils";
 import cn from "classnames";
 
 interface ChannelSupport {
@@ -21,7 +20,7 @@ interface Channel {
 
 const ListChannel: FC = () => {
   const toast = useToast();
-  const { user } = useAuth();
+  const uid = getUID();
 
   const [channelsSupport, setChannelsSupport] = useState<ChannelSupport>({
     telegram: false,
@@ -80,7 +79,7 @@ const ListChannel: FC = () => {
                 botName={import.meta.env.VITE_TELEGRAM_BOT}
                 dataAuthUrl={`${
                   import.meta.env.VITE_SERVER_URL
-                }/auth/telegram?uid=${user.uid}`}
+                }/auth/telegram?uid=${uid}`}
               />
             )}
           </div>
