@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from "react";
 import TelegramLoginButton from "telegram-login-button";
 import { useToast } from "@chakra-ui/react";
 import { FaFacebookMessenger, FaTelegramPlane } from "react-icons/fa";
-import { request } from "@/apis/axios";
+import { request, defaultConfig } from "@/apis/axios";
 import type { IHttpResponse } from "@/types/http";
 import { AlertCustom, getUID } from "@/utils";
 import cn from "classnames";
@@ -77,9 +77,7 @@ const ListChannel: FC = () => {
             ) : (
               <TelegramLoginButton
                 botName={import.meta.env.VITE_TELEGRAM_BOT}
-                dataAuthUrl={`${
-                  import.meta.env.VITE_SERVER_URL
-                }/auth/telegram?uid=${uid}`}
+                dataAuthUrl={`${defaultConfig.server.baseUrl}/auth/telegram?uid=${uid}`}
               />
             )}
           </div>

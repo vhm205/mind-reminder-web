@@ -1,55 +1,62 @@
 import { FC, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Button,
+  Skeleton,
+  Text,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
 import dayjs from "dayjs";
 
 /**
  * components
  */
-import { Button, Skeleton, Text, useToast } from "@chakra-ui/react";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { ModalCreateTopic } from "./components/ModalCreateTopic";
 
-/**
- * assets
- */
-import { PlusIcon, BackIcon } from "@/components/icons";
+import { PlusIcon } from "@/components/icons";
 import { AlertCustom } from "@/utils";
-import { IHttpResponse } from "@/types/http";
+import type { IHttpResponse } from "@/types/http";
 import { request } from "@/apis/axios";
 import { Breadcrumbs } from "@/components/breadcrumb";
 import { BoxWrapper } from "@/components/box/BoxWrapper";
 
-const ListNote: FC = () => {
-  const { id: topicId } = useParams();
-  const navigate = useNavigate();
+const ListTopic: FC = () => {
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const uid = query.get("uid");
 
   const [isLoading, setIsLoading] = useState(false);
   const [refresh, setRefresh] = useState("");
-  const [notes, setNotes] = useState([]);
+  const [topics, setTopics] = useState([]);
 
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    const fetchNotes = async () => {
+    uid && localStorage.setItem("uid", uid);
+  }, [uid]);
+
+  useEffect(() => {
+    const fetchTopics = async () => {
       setIsLoading(true);
 
       try {
-        const response: IHttpResponse = await request.get(
-          `/notes?topicId=${topicId}`,
-        );
+        const response: IHttpResponse = await request.get(`/topics`);
 
-        console.log({ response });
-
-        if (response.statusCode !== 200) {
+        if (!response || response.statusCode !== 200) {
           return AlertCustom(toast, response.message, "warning");
         }
 
-        const { data: notes } = response.data;
-        setNotes(notes);
+        const { data: topics } = response.data;
+
+        setTopics(topics);
       } catch (error: any) {
         AlertCustom(toast, error.message, "error");
       } finally {
@@ -57,16 +64,20 @@ const ListNote: FC = () => {
       }
     };
 
-    topicId && fetchNotes();
-  }, [refresh, topicId]);
+    fetchTopics();
+  }, [refresh]);
 
-  const handleDeleteNote = async (id: string) => {
+  const onSubmit = () => setRefresh(`${Date.now()}`);
+
+  const handleDeleteTopic = async (id: string) => {
     try {
-      const response: IHttpResponse = await request.delete(`/notes?id=${id}`);
+      const response: IHttpResponse = await request.delete(
+        `/topics?topicId=${id}`,
+      );
 
       if (response.statusCode === 204) {
-        AlertCustom(toast, "Delete note successfully", "success");
-        setRefresh(Date.now().toString());
+        AlertCustom(toast, "Delete topic successfully", "success");
+        setRefresh(`${Date.now()}`);
       } else {
         AlertCustom(toast, response.message, "warning");
       }
@@ -79,18 +90,14 @@ const ListNote: FC = () => {
     <>
       <div className="flex justify-between p-4">
         <div>
-          <Link to={`/topics`} className="flex">
-            <BackIcon extra="mr-2" />
-            <Text fontSize="md">Back</Text>
-          </Link>
+          <Text fontSize="2xl" fontWeight="bold">
+            Topics
+          </Text>
         </div>
         <Breadcrumbs />
       </div>
       <div className="container flex max-w-full max-h-full overflow-y-auto flex-col px-6 py-3">
         <BoxWrapper>
-          <Text fontSize="2xl" fontWeight="bold">
-            Notes
-          </Text>
           <Skeleton height="100vh" isLoaded={!isLoading}>
             <div className="mt-5 overflow-y-auto flex justify-center">
               <div className="flex flex-wrap justify-center">
@@ -101,25 +108,27 @@ const ListNote: FC = () => {
                   borderColor="green.500"
                   height="250px"
                   width="250px"
-                  onClick={() => navigate(`/note/${topicId}/create`)}
+                  onClick={onOpen}
                 >
-                  <PlusIcon extra="size-18" />
+                  <PlusIcon />
                 </Button>
-                {!!notes.length &&
-                  notes.map((note: any) => (
-                    <ContextMenu key={note._id}>
+                {!!topics.length &&
+                  topics.map((topic: any) => (
+                    <ContextMenu key={topic._id}>
                       <ContextMenuTrigger>
                         <Link
-                          to={`/note/${note._id}`}
-                          className="bg-brand-primary text-white flex flex-col justify-between items-stretch rounded-lg size-64 p-5 mr-10 mb-10 border-solid border-5 hover:drop-shadow-lg hover:cursor-pointer transition ease-in-out hover:-translate-y-1 hover:scale-102 hover:text-white duration-300"
+                          to={`/topic/${topic._id}`}
+                          className="bg-brand-primary text-white flex flex-col justify-between items-stretch rounded-lg size-64 p-5 mr-10 mb-10 border-solid border-5 hover:drop-shadow-lg hover:cursor-pointer transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-300 hover:text-white"
                         >
                           <div className="mb-2">
-                            <Text fontSize="xl">{note.title}</Text>
+                            <Text fontSize="xl">{topic.title}</Text>
                           </div>
                           <div>
                             <hr />
                             <Text fontSize="sm" as="i" color="gray.200">
-                              {dayjs(note.createdAt).format("DD/MM/YYYY HH:mm")}
+                              {dayjs(topic.createdAt).format(
+                                "DD/MM/YYYY HH:mm",
+                              )}
                             </Text>
                           </div>
                         </Link>
@@ -127,7 +136,7 @@ const ListNote: FC = () => {
                       <ContextMenuContent>
                         <ContextMenuItem
                           className="text-red-500"
-                          onClick={() => handleDeleteNote(note._id)}
+                          onClick={() => handleDeleteTopic(topic._id)}
                         >
                           Delete
                         </ContextMenuItem>
@@ -139,8 +148,9 @@ const ListNote: FC = () => {
           </Skeleton>
         </BoxWrapper>
       </div>
+      <ModalCreateTopic isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
     </>
   );
 };
 
-export default ListNote;
+export default ListTopic;

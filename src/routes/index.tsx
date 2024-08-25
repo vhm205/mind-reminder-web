@@ -11,8 +11,11 @@ import { Loader } from "@/components/loader";
 
 const LoginPage = lazy(() => import("@/pages/auth/Login"));
 
+const ListTopicPage = lazy(() => import("@/pages/topic/ListTopic"));
+
 const ListNotePage = lazy(() => import("@/pages/note/ListNote"));
 const CreateNotePage = lazy(() => import("@/pages/note/CreateNote"));
+const DetailNotePage = lazy(() => import("@/pages/note/DetailNote"));
 
 const ListChannelPage = lazy(() => import("@/pages/channel/ListChannel"));
 
@@ -33,8 +36,11 @@ export const Router = () => {
       <Route path="/" element={<UserLayout />}>
         <Route index element={<HomePage />} />
 
-        <Route path="notes" element={<ListNotePage />} />
-        <Route path="notes/create" element={<CreateNotePage />} />
+        <Route path="topics" element={<ListTopicPage />} />
+        <Route path="topic/:id" element={<ListNotePage />} />
+
+        <Route path="note/:id/create" element={<CreateNotePage />} />
+        <Route path="note/:id" element={<DetailNotePage />} />
 
         <Route path="channels" element={<ListChannelPage />} />
 

@@ -9,3 +9,9 @@ TODO:
 
 - Color Palette
   https://coolors.co/palettes/trending
+
+# NOTE:
+
+Pick components: https://ui.shadcn.com/
+Install UI components: https://www.radix-ui.com/themes/docs/components
+Maybe: https://flowbite-react.com/docs/components

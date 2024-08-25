@@ -1,17 +1,26 @@
 import { ChangeEvent, FC, MouseEvent, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import {
   useToast,
   Badge,
   Button,
-  Textarea,
   Divider,
   Input,
   Checkbox,
+  Text,
+  useColorMode,
 } from "@chakra-ui/react";
+
+import "@blocknote/core/fonts/inter.css";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/mantine/style.css";
 
 import { AlertCustom, getRandomItem } from "@/utils";
 import { request } from "@/apis/axios";
 import { IHttpResponse } from "@/types/http";
+import { BackIcon } from "@/components/icons";
+import { BoxWrapper } from "@/components/box/BoxWrapper";
 
 const colorsScheme = [
   "green",
@@ -26,14 +35,21 @@ const colorsScheme = [
 ];
 
 const CreateNote: FC = () => {
+  const { id: topicId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [tags, setTags] = useState<string[]>(["UNKNOWN"]);
-  const [content, setContent] = useState("");
   const [pushNotification, setPushNotification] = useState(true);
+  const [title, setTitle] = useState("");
 
   const toast = useToast();
+  const editor = useCreateBlockNote();
+  const { colorMode } = useColorMode();
 
   const handleSubmit = async () => {
+    const blocks = editor.document;
+    const markdown = await editor.blocksToMarkdownLossy(blocks);
+    const html = await editor.blocksToHTMLLossy(blocks);
+
     try {
       setIsLoading(true);
 
@@ -45,13 +61,21 @@ const CreateNote: FC = () => {
           .map((tag) => tag.trimStart());
       }
 
-      if (!content) {
+      if (!title) {
+        return AlertCustom(toast, "Please enter title", "warning");
+      }
+
+      if (!html) {
         return AlertCustom(toast, "Please enter content", "warning");
       }
 
       const response: IHttpResponse = await request.post("/notes", {
+        topicId,
         tags: newTags,
-        content,
+        title,
+        markdown,
+        html,
+        blocks: JSON.stringify(blocks),
         pushNotification,
       });
 
@@ -59,18 +83,16 @@ const CreateNote: FC = () => {
         return AlertCustom(toast, response.message, "warning");
       }
 
+      editor.replaceBlocks(editor.document, []);
       setTags(["UNKNOWN"]);
-      setContent("");
+      setTitle("");
+
       return AlertCustom(toast, "Create note success", "success");
     } catch (error: any) {
       return AlertCustom(toast, error.message, "error");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleChangeContent = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(event.target.value);
   };
 
   const handleKeyUp = (event: any) => {
@@ -104,57 +126,74 @@ const CreateNote: FC = () => {
   };
 
   return (
-    <div className="container flex max-w-full max-h-full overflow-y-auto flex-col px-6 py-3">
-      <div className="flex justify-center mb-5">
-        <div className="flex flex-col justify-center w-2/4 card-new-note p-6">
-          <div className="text-3xl font-semibold mb-1">Create new note</div>
-          <Divider className="mb-3" />
-          <div className="mb-4">
-            <Input
-              placeholder="Add tags (ex: knowledge, life)"
-              onKeyUp={handleKeyUp}
-            />
-            {!!tags.length &&
-              tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  mr={2}
-                  colorScheme={getRandomItem(colorsScheme)}
-                  onClick={handleClickTag}
-                  className="cursor-pointer"
-                >
-                  {tag}
-                </Badge>
-              ))}
-          </div>
-          <div className="mb-2">
-            <Textarea
-              placeholder="Note something..."
-              size="lg"
-              resize="vertical"
-              rows={10}
-              value={content}
-              onChange={handleChangeContent}
-            />
-          </div>
-          <div className="flex justify-between">
-            <Checkbox
-              defaultChecked
-              onChange={() => setPushNotification(!pushNotification)}
-            >
-              Push notification
-            </Checkbox>
-            <Button
-              variant="primary"
-              isLoading={isLoading}
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
-          </div>
+    <>
+      <div className="container flex justify-center max-w-full max-h-full overflow-y-auto px-6 py-3">
+        <div className="flex flex-col mb-5">
+          <BoxWrapper
+            width={[200, 500, 650, 800]}
+            extra="flex flex-col justify-center p-6 mb-3"
+          >
+            <Link to={`/topic/${topicId}`} className="mb-5 flex">
+              <BackIcon extra="mr-2" />
+              <Text>Back</Text>
+            </Link>
+            <div className="text-3xl font-semibold mb-1">New note</div>
+            <Divider className="mb-3" />
+            <div className="mb-4">
+              <Input
+                placeholder="Title"
+                value={title}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setTitle(e.target.value)
+                }
+              />
+            </div>
+            <div className="mb-2">
+              <BlockNoteView
+                editor={editor}
+                theme={colorMode}
+                style={{ minHeight: 300 }}
+              />
+            </div>
+          </BoxWrapper>
+          <BoxWrapper
+            width={[200, 500, 650, 800]}
+            extra="flex flex-col justify-center p-6"
+          >
+            <div className="mb-1">
+              {!!tags.length &&
+                tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    mr={2}
+                    colorScheme={getRandomItem(colorsScheme)}
+                    onClick={handleClickTag}
+                    className="cursor-pointer"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              <Input
+                placeholder="Add tags (ex: knowledge, life)"
+                onKeyUp={handleKeyUp}
+              />
+            </div>
+            <Divider mb={3} mt={2} />
+            <div className="flex justify-between">
+              <Checkbox
+                defaultChecked
+                onChange={() => setPushNotification(!pushNotification)}
+              >
+                Push notification
+              </Checkbox>
+              <Button size="lg" isLoading={isLoading} onClick={handleSubmit}>
+                Submit
+              </Button>
+            </div>
+          </BoxWrapper>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

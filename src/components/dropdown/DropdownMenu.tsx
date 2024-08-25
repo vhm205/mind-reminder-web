@@ -13,7 +13,11 @@ import { MdOutlineMenu, MdLogout } from "react-icons/md";
 import { request, defaultConfig } from "@/apis/axios";
 import { logout } from "@/utils";
 
-export const DropdownMenu: FC = () => {
+type Props = {
+  extra?: string;
+};
+
+export const DropdownMenu: FC<Props> = () => {
   const handleLogout = async () => {
     try {
       const { server } = defaultConfig;

@@ -2,11 +2,29 @@ import axios from "axios";
 import Cookie from "js-cookie";
 import { IExtraConfig, IHttpRequestConfig } from "@/types/http";
 
+const {
+  VITE_ENV,
+  VITE_API_URL,
+  VITE_SERVER_URL,
+  VITE_API_VERSION,
+  VITE_API_URL_DEV,
+  VITE_SERVER_URL_DEV,
+} = import.meta.env;
+
+const serverUrl: Record<string, string> = {
+  development: VITE_SERVER_URL_DEV,
+  production: VITE_SERVER_URL,
+};
+const apiUrl: Record<string, string> = {
+  development: VITE_API_URL_DEV,
+  production: VITE_API_URL,
+};
+
 export const defaultConfig: IHttpRequestConfig = {
   server: {
-    api: import.meta.env.VITE_API_URL,
-    baseUrl: import.meta.env.VITE_SERVER_URL,
-    version: import.meta.env.VITE_API_VERSION,
+    api: apiUrl[VITE_ENV],
+    baseUrl: serverUrl[VITE_ENV],
+    version: VITE_API_VERSION,
     headers: {
       "Content-Type": "application/json",
     },
@@ -32,13 +50,11 @@ class HttpRequest {
 
   public init() {
     const { apiVersion, headers } = this.config;
-    const { api } = defaultConfig.server;
+    const { api, headers: _headers } = defaultConfig.server;
 
     const options: Record<string, any> = {
       baseURL: api,
-      headers: {
-        "Content-type": "application/json",
-      },
+      headers: _headers,
       withCredentials: true,
       withXSRFToken: true,
     };
@@ -48,7 +64,9 @@ class HttpRequest {
     }
 
     if (headers && Object.keys(headers).length) {
-      options.headers = { ...headers };
+      Object.keys(headers).forEach((key) => {
+        options.headers[key] = headers[key];
+      });
     }
 
     const instance = axios.create(options);
@@ -66,13 +84,20 @@ class HttpRequest {
 
     instance.interceptors.response.use(
       function (response) {
+        if (response.status === 204) {
+          return {
+            statusCode: response.status,
+            statusText: response.statusText,
+          };
+        }
+
         return response.data;
       },
       function (error) {
         const resp = error.response;
-        const data = resp.data;
+        const data = resp?.data;
 
-        if (data.path !== "/auth/check") {
+        if (data && data.path !== "/auth/check") {
           if (resp.status === 401 || resp.statusText === "Unauthorized") {
             Cookie.remove("isAuthenticated");
             window.location.replace("/auth/login");
