@@ -1,20 +1,10 @@
 import { ChangeEvent, FC, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import debounce from "lodash.debounce";
 
 /**
  * components
  */
-import {
-  useToast,
-  Button,
-  Divider,
-  Text,
-  useColorMode,
-  Checkbox,
-  Input,
-  Badge,
-} from "@chakra-ui/react";
+import { useToast, Text, useColorMode, Badge } from "@chakra-ui/react";
 import "@blocknote/core/fonts/inter.css";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -29,12 +19,15 @@ import { IHttpResponse } from "@/types/http";
 import { BackIcon } from "@/components/icons";
 import { BoxWrapper } from "@/components/box/BoxWrapper";
 import { Loader } from "@/components/loader";
+import EditNote from "./EditNote";
+import { InputEditable } from "@/components/editable/InputEditable";
 
 interface Note {
   id: string;
   title: string;
   blocks: string;
   status: string;
+  pushNotification: boolean;
   tags: string[];
   createdAt: string;
   topic: {
@@ -57,12 +50,8 @@ const colorsScheme = [
 
 const DetailNote: FC = () => {
   const { id: noteId } = useParams();
-  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [note, setNote] = useState<Note | null>(null);
-  const [pushNotification, setPushNotification] = useState(true);
-  const [formData, setFormdata] = useState<Record<string, string>>({
-    title: "",
-  });
+  const [editMode, setEditMode] = useState(false);
 
   const toast = useToast();
   const editor = useCreateBlockNote();
@@ -91,22 +80,15 @@ const DetailNote: FC = () => {
     editor.replaceBlocks(editor.document, JSON.parse(note.blocks));
   }, [note]);
 
-  const handleSubmit = async () => {
-    const blocks = editor.document;
+  const toggleEditModeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setEditMode(checked);
+  };
 
+  const handleUpdateTitle = async (newTitle: string) => {
     try {
-      setIsSubmitLoading(true);
-
-      // const [{ id: block1 }, { id: block2 }, { id: block3 }] = blocks;
-      // const newBlocks = [
-      //   { id: block1, content: JSON.stringify(docs) },
-      //   { id: block2, content: markdown },
-      //   { id: block3, content: html },
-      // ];
-
       const response: IHttpResponse = await request.patch("/notes", {
-        ...formData,
-        content: JSON.stringify(blocks),
+        title: newTitle,
         noteId,
       });
 
@@ -114,19 +96,10 @@ const DetailNote: FC = () => {
         return AlertCustom(toast, response.message, "warning");
       }
 
-      return AlertCustom(toast, "Update note success", "success");
+      return AlertCustom(toast, "Update title success", "success");
     } catch (error: any) {
       return AlertCustom(toast, error.message, "error");
-    } finally {
-      setIsSubmitLoading(false);
     }
-  };
-
-  const handleFormChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormdata({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
   };
 
   if (!note) {
@@ -140,33 +113,31 @@ const DetailNote: FC = () => {
           width={[200, 500, 650, 800]}
           className="flex flex-col justify-center p-6 mb-3"
         >
-          <Link to={`/topic/${note.topic._id}`} className="mb-5 flex">
-            <BackIcon extra="mr-2" />
-            <Text>Back</Text>
-          </Link>
+          <div className="flex justify-between">
+            <Link to={`/topic/${note.topic._id}`} className="mb-5 flex">
+              <BackIcon extra="mr-2" />
+              <Text>Back</Text>
+            </Link>
+            <label className="label cursor-pointer">
+              <span className="label-text mr-2">Edit mode</span>
+              <input
+                type="checkbox"
+                className="toggle toggle-md"
+                onChange={toggleEditModeChange}
+              />
+            </label>
+          </div>
           <div className="mb-1">
-            <Input
-              size="lg"
-              name="title"
-              placeholder="Title"
-              defaultValue={note.title}
-              onChange={debounce(handleFormChange, 500)}
+            <InputEditable
+              content={note.title}
+              approve={handleUpdateTitle}
+              props={{
+                fontWeight: "semibold",
+                fontSize: "2xl",
+              }}
             />
           </div>
-        </BoxWrapper>
-        <BoxWrapper
-          width={[200, 500, 650, 800]}
-          className="flex flex-col justify-center p-6"
-        >
-          <div className="mb-2">
-            <BlockNoteView
-              editor={editor}
-              theme={colorMode}
-              style={{ minHeight: 300 }}
-            />
-          </div>
-          <div>
-            <Divider mb={2} />
+          <div className="hidden">
             {!!note.tags.length &&
               note.tags.map((tag) => (
                 <Badge
@@ -179,22 +150,22 @@ const DetailNote: FC = () => {
                 </Badge>
               ))}
           </div>
-          <div className="flex justify-between">
-            <Checkbox
-              defaultChecked
-              onChange={() => setPushNotification(!pushNotification)}
-            >
-              Push notification
-            </Checkbox>
-            <Button
-              size="lg"
-              isLoading={isSubmitLoading}
-              onClick={handleSubmit}
-            >
-              Update
-            </Button>
-          </div>
         </BoxWrapper>
+        {editMode ? (
+          <EditNote note={note} />
+        ) : (
+          <BoxWrapper
+            width={[200, 500, 650, 800]}
+            className="flex flex-col justify-center p-6"
+          >
+            <BlockNoteView
+              editor={editor}
+              theme={colorMode}
+              style={{ minHeight: 300 }}
+              editable={editMode}
+            />
+          </BoxWrapper>
+        )}
       </div>
     </div>
   );
