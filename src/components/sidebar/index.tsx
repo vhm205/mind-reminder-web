@@ -6,7 +6,6 @@ import brand from "@/assets/img/m2t-logo-transparent.png";
 import avatar from "@/assets/img/vhm-brand.png";
 
 import { SidebarContext } from "@/contexts";
-import { Button } from "@chakra-ui/react";
 
 type Props = {
   children: React.ReactNode;
