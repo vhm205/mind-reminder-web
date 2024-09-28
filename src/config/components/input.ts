@@ -20,7 +20,6 @@ export default defineStyleConfig({
     },
   },
   defaultProps: {
-    focusBorderColor: "brand.single",
     variant: "outline",
   },
 });
