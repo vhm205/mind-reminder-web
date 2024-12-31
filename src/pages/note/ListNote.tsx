@@ -42,8 +42,6 @@ const ListNote: FC = () => {
           `/notes?topicId=${topicId}`,
         );
 
-        console.log({ response });
-
         if (response.statusCode !== 200) {
           return AlertCustom(toast, response.message, "warning");
         }

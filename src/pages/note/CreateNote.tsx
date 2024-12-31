@@ -1,5 +1,5 @@
 import { ChangeEvent, FC, MouseEvent, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   useToast,
   Badge,
@@ -41,6 +41,7 @@ const CreateNote: FC = () => {
   const [pushNotification, setPushNotification] = useState(true);
   const [title, setTitle] = useState("");
 
+  const navigate = useNavigate();
   const toast = useToast();
   const editor = useCreateBlockNote();
   const { colorMode } = useColorMode();
@@ -83,11 +84,19 @@ const CreateNote: FC = () => {
         return AlertCustom(toast, response.message, "warning");
       }
 
-      editor.replaceBlocks(editor.document, []);
-      setTags(["UNKNOWN"]);
-      setTitle("");
+      // editor.replaceBlocks(editor.document, []);
+      // setTags(["UNKNOWN"]);
+      // setTitle("");
 
-      return AlertCustom(toast, "Create note success", "success");
+      AlertCustom(
+        toast,
+        "Create note success, navigating after 700ms...",
+        "success",
+      );
+
+      setTimeout(() => {
+        navigate(`/topic/${topicId}`);
+      }, 700);
     } catch (error: any) {
       return AlertCustom(toast, error.message, "error");
     } finally {
